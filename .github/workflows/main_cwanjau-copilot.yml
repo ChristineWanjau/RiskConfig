@@ -52,4 +52,4 @@ jobs:
           app-name: 'cwanjau-copilot'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9BCBAB0E1E3843CFA9D88267B3458350 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_75534F986D714C87983129E8B30B6C07 }}
