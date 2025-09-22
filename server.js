@@ -48,7 +48,7 @@ app.get('/configs', asyncHandler(async (req, res) => {
     }
 }));
 
-// GET /configs/:resourceId - Get config by resourceId
+// GET /configs/:resourceId - Get config by resourceId (keep for backwards compatibility)
 app.get('/configs/:resourceId', validateResourceId, asyncHandler(async (req, res) => {
     try {
         const { resourceId } = req.params;
@@ -73,8 +73,106 @@ app.get('/configs/:resourceId', validateResourceId, asyncHandler(async (req, res
     }
 }));
 
-// POST /configs/:resourceId - Save config for resourceId
+// POST /configs - Save config with resourceId in body
+app.post('/configs', asyncHandler(async (req, res) => {
+    try {
+        const { resourceId, ...configData } = req.body;
+
+        if (!resourceId || typeof resourceId !== 'string' || resourceId.trim() === '') {
+            return res.status(400).json({
+                error: 'Invalid or missing resourceId',
+                message: 'resourceId must be provided as a non-empty string in the request body'
+            });
+        }
+
+        if (!configData || Object.keys(configData).length === 0) {
+            return res.status(400).json({
+                error: 'Invalid request body',
+                message: 'Request body must contain configuration data along with resourceId'
+            });
+        }
+
+        const savedConfig = dataStore.saveConfig(resourceId, configData);
+        const isUpdate = savedConfig.createdAt !== savedConfig.updatedAt;
+        
+        res.status(isUpdate ? 200 : 201).json({
+            success: true,
+            message: isUpdate ? 'Configuration updated successfully' : 'Configuration created successfully',
+            data: savedConfig
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Internal server error',
+            message: error.message
+        });
+    }
+}));
+
+// POST /configs/:resourceId - Save config for resourceId (keep for backwards compatibility)
 app.post('/configs/:resourceId', validateResourceId, asyncHandler(async (req, res) => {
+    try {
+        const { resourceId } = req.params;
+        const configData = req.body;
+
+        if (!configData || typeof configData !== 'object') {
+            return res.status(400).json({
+                error: 'Invalid request body',
+                message: 'Request body must be a valid configuration object'
+            });
+        }
+
+        const savedConfig = dataStore.saveConfig(resourceId, configData);
+        const isUpdate = savedConfig.createdAt !== savedConfig.updatedAt;
+        
+        res.status(isUpdate ? 200 : 201).json({
+            success: true,
+            message: isUpdate ? 'Configuration updated successfully' : 'Configuration created successfully',
+            data: savedConfig
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Internal server error',
+            message: error.message
+        });
+    }
+}));
+
+// PUT /configs - Update config with resourceId in body
+app.put('/configs', asyncHandler(async (req, res) => {
+    try {
+        const { resourceId, ...configData } = req.body;
+
+        if (!resourceId || typeof resourceId !== 'string' || resourceId.trim() === '') {
+            return res.status(400).json({
+                error: 'Invalid or missing resourceId',
+                message: 'resourceId must be provided as a non-empty string in the request body'
+            });
+        }
+
+        if (!configData || Object.keys(configData).length === 0) {
+            return res.status(400).json({
+                error: 'Invalid request body',
+                message: 'Request body must contain configuration data along with resourceId'
+            });
+        }
+
+        const savedConfig = dataStore.saveConfig(resourceId, configData);
+        
+        res.json({
+            success: true,
+            message: 'Configuration updated successfully',
+            data: savedConfig
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Internal server error',
+            message: error.message
+        });
+    }
+}));
+
+// PUT /configs/:resourceId - Update config for resourceId (keep for backwards compatibility)
+app.put('/configs/:resourceId', validateResourceId, asyncHandler(async (req, res) => {
     try {
         const { resourceId } = req.params;
         const configData = req.body;
@@ -130,7 +228,41 @@ app.put('/configs/:resourceId', validateResourceId, asyncHandler(async (req, res
     }
 }));
 
-// DELETE /configs/:resourceId - Delete config by resourceId
+// DELETE /configs - Delete config with resourceId in body
+app.delete('/configs', asyncHandler(async (req, res) => {
+    try {
+        const { resourceId } = req.body;
+
+        if (!resourceId || typeof resourceId !== 'string' || resourceId.trim() === '') {
+            return res.status(400).json({
+                error: 'Invalid or missing resourceId',
+                message: 'resourceId must be provided as a non-empty string in the request body'
+            });
+        }
+
+        const deletedConfig = dataStore.deleteConfig(resourceId);
+        
+        if (!deletedConfig) {
+            return res.status(404).json({
+                error: 'Configuration not found',
+                message: `Configuration for resourceId '${resourceId}' does not exist`
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Configuration deleted successfully',
+            data: deletedConfig
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Internal server error',
+            message: error.message
+        });
+    }
+}));
+
+// DELETE /configs/:resourceId - Delete config by resourceId (keep for backwards compatibility)
 app.delete('/configs/:resourceId', validateResourceId, asyncHandler(async (req, res) => {
     try {
         const { resourceId } = req.params;
@@ -188,10 +320,13 @@ app.listen(port, () => {
     console.log(`📖 Health check: http://localhost:${port}/health`);
     console.log(`🔍 API endpoints:`);
     console.log(`   GET    /configs              - Get all configurations`);
-    console.log(`   GET    /configs/:resourceId  - Get config by resourceId`);
-    console.log(`   POST   /configs/:resourceId  - Save config for resourceId`);
-    console.log(`   PUT    /configs/:resourceId  - Update config for resourceId`);
-    console.log(`   DELETE /configs/:resourceId  - Delete config by resourceId`);
+    console.log(`   GET    /configs/:resourceId  - Get config by resourceId (legacy)`);
+    console.log(`   POST   /configs              - Save config with resourceId in body`);
+    console.log(`   POST   /configs/:resourceId  - Save config for resourceId (legacy)`);
+    console.log(`   PUT    /configs              - Update config with resourceId in body`);
+    console.log(`   PUT    /configs/:resourceId  - Update config for resourceId (legacy)`);
+    console.log(`   DELETE /configs              - Delete config with resourceId in body`);
+    console.log(`   DELETE /configs/:resourceId  - Delete config by resourceId (legacy)`);
 });
 
 module.exports = app;
