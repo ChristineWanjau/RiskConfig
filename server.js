@@ -186,7 +186,7 @@ app.get('/health', (req, res) => {
 });
 
 // Risk Assessment Documentation endpoint
-app.get('/risk-assessment-guide', (req, res) => {
+app.get('/configs/assess-risk', (req, res) => {
     try {
         const fs = require('fs');
         const path = require('path');
@@ -202,8 +202,7 @@ app.get('/risk-assessment-guide', (req, res) => {
                 res.set('Content-Type', 'text/markdown');
                 res.send(markdownContent);
             } else {
-                res.json({
-                    success: true,
+                res.status(200).json({
                     data: {
                         title: 'AI-Powered Configuration Risk Assessment Guide',
                         content: markdownContent,
@@ -256,7 +255,7 @@ app.post('/configs/assess-risk', (req, res) => {
             }
         };
 
-        res.json(response);
+        res.status(200).json(response);
     } catch (error) {
         res.status(500).json({
             error: 'Risk assessment failed',
