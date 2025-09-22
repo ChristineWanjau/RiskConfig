@@ -229,12 +229,12 @@ app.get('/risk-assessment-guide', (req, res) => {
 // Simple risk assessment endpoint (returns static example data)
 app.post('/configs/assess-risk', (req, res) => {
     try {
-        const { resourceId, newConfig } = req.body;
+        const { newConfig } = req.body;
 
-        if (!resourceId || !newConfig) {
+        if (!newConfig) {
             return res.status(400).json({
                 error: 'Invalid request body',
-                message: 'resourceId and newConfig are required for risk assessment'
+                message: 'newConfig is required for risk assessment'
             });
         }
 
@@ -252,8 +252,8 @@ app.post('/configs/assess-risk', (req, res) => {
         const response = {
             assessmentId: `risk-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             timestamp: new Date().toISOString(),
-            resourceId: resourceId,
             message: "This is a placeholder endpoint. The guide below shows how to implement full risk assessment.",
+            configurationData: newConfig,
             riskAssessmentGuide: riskAssessmentGuide,
             exampleAssessment: {
                 overallRiskScore: 8.5,
