@@ -186,7 +186,7 @@ app.get('/health', (req, res) => {
 });
 
 // Risk Assessment Documentation endpoint
-app.get('/configs/assess-risk', (req, res) => {
+app.get('/assess-risk', (req, res) => {
     try {
         const fs = require('fs');
         const path = require('path');
@@ -197,20 +197,15 @@ app.get('/configs/assess-risk', (req, res) => {
             
             // Check if client wants JSON format or raw markdown
             const format = req.query.format || 'json';
-            
-            if (format === 'raw' || req.headers.accept === 'text/markdown') {
-                res.set('Content-Type', 'text/markdown');
-                res.send(markdownContent);
-            } else {
-                res.status(200).json({
-                    data: {
-                        title: 'AI-Powered Configuration Risk Assessment Guide',
-                        content: markdownContent,
-                        contentType: 'markdown',
-                        lastModified: fs.statSync(markdownPath).mtime.toISOString()
-                    }
-                });
-            }
+
+            res.status(200).json({
+                data: {
+                    title: 'AI-Powered Configuration Risk Assessment Guide',
+                    content: markdownContent,
+                    contentType: 'markdown',
+                    lastModified: fs.statSync(markdownPath).mtime.toISOString()
+                }
+            });
         } else {
             res.status(404).json({
                 error: 'Documentation not found',
@@ -226,7 +221,7 @@ app.get('/configs/assess-risk', (req, res) => {
 });
 
 // Simple risk assessment endpoint (returns static example data)
-app.post('/configs/assess-risk', (req, res) => {
+app.post('/assess-risk', (req, res) => {
     try {
         const { newConfig } = req.body;
 
