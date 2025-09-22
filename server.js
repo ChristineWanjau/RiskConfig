@@ -250,76 +250,8 @@ app.post('/configs/assess-risk', (req, res) => {
 
         // Return example risk assessment data with guide
         const response = {
-            assessmentId: `risk-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            timestamp: new Date().toISOString(),
-            message: "This is a placeholder endpoint. The guide below shows how to implement full risk assessment.",
             configurationData: newConfig,
-            riskAssessmentGuide: riskAssessmentGuide,
-            exampleAssessment: {
-                overallRiskScore: 8.5,
-                riskLevel: "HIGH",
-                findings: [
-                    {
-                        category: "Type Mismatch",
-                        severity: "HIGH",
-                        score: 8,
-                        field: "database.connectionTimeout",
-                        issue: "Numeric value changed to string",
-                        before: 30000,
-                        after: "30000",
-                        recommendation: "Convert back to numeric type",
-                        impact: "Database connections may fail"
-                    },
-                    {
-                        category: "Sensitive Information",
-                        severity: "CRITICAL",
-                        score: 10,
-                        field: "auth.apiKey",
-                        issue: "API key exposed in configuration",
-                        recommendation: "Move to secure key vault",
-                        impact: "Unauthorized API access possible"
-                    },
-                    {
-                        category: "Policy Compliance",
-                        severity: "MEDIUM",
-                        score: 6,
-                        field: "security.requireHTTPS",
-                        issue: "HTTPS requirement disabled",
-                        before: true,
-                        after: false,
-                        recommendation: "Re-enable HTTPS requirement",
-                        impact: "Data transmission not encrypted"
-                    }
-                ],
-                recommendations: {
-                    immediate: [
-                        "Remove exposed API key from configuration",
-                        "Fix database connection timeout type"
-                    ],
-                    shortTerm: [
-                        "Implement configuration validation pipeline",
-                        "Set up secret management system"
-                    ],
-                    longTerm: [
-                        "Establish configuration governance policies",
-                        "Implement automated compliance checking"
-                    ]
-                },
-                summary: {
-                    totalFindings: 3,
-                    criticalFindings: 1,
-                    highFindings: 1,
-                    mediumFindings: 1,
-                    lowFindings: 0
-                }
-            },
-            implementationNotes: {
-                typeChecking: "Compare data types between baseline and new configurations",
-                deviationAnalysis: "Calculate percentage changes and flag significant deviations",
-                policyCompliance: "Check against security standards (OWASP, NIST) and corporate policies",
-                sensitiveDataDetection: "Use regex patterns to identify API keys, passwords, and credentials",
-                filePathValidation: "Verify file system accessibility and detect unsafe paths"
-            }
+            riskAssessmentGuide: riskAssessmentGuide
         };
         
         res.json({
