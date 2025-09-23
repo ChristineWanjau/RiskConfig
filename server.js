@@ -223,14 +223,6 @@ app.get('/assess-risk', (req, res) => {
 // Simple risk assessment endpoint (returns static example data)
 app.post('/assess-risk', (req, res) => {
     try {
-        const { newConfig } = req.body;
-
-        if (!newConfig) {
-            return res.status(400).json({
-                error: 'Invalid request body',
-                message: 'newConfig is required for risk assessment'
-            });
-        }
 
         // Load the risk assessment guide
         const fs = require('fs');
@@ -245,7 +237,6 @@ app.post('/assess-risk', (req, res) => {
         // Return example risk assessment data with guide
         const response = {
             data: {
-                configurationData: newConfig,
                 riskAssessmentGuide: riskAssessmentGuide
             }
         };
